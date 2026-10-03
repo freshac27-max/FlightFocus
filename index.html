@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FlightFocus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="-16 -14 32 28" aria-hidden="true"><path fill="currentColor" d="M14 0 L4 -2 L-2 -12 L-6 -12 L-3 -2 L-10 -1.6 L-13 -6 L-15.5 -6 L-13.5 0 L-15.5 6 L-13 6 L-10 1.6 L-3 2 L-6 12 L-2 12 L4 2 Z"/></svg>
+      FlightFocus
+    </div>
+    <button class="ghost" id="openLog">Logbook</button>
+  </header>
+
+  <!-- SETUP -->
+  <section id="setup" class="setup">
+    <div>
+      <h1>How long do you want to focus?</h1>
+      <div class="chips" id="chips" role="group" aria-label="Focus length"></div>
+      <div class="custom">
+        <span class="muted">Or set your own:</span>
+        <input type="number" id="cH" min="0" max="20" value="1" aria-label="Hours"> <span>h</span>
+        <input type="number" id="cM" min="0" max="59" value="0" aria-label="Minutes"> <span>m</span>
+      </div>
+      <label class="field">
+        <span class="muted">Departing from</span>
+        <select id="origin"></select>
+      </label>
+      <h2>Flights about that long</h2>
+      <div class="options" id="options" role="radiogroup" aria-label="Destination"></div>
+    </div>
+    <div>
+      <div class="pass" aria-label="Boarding pass">
+        <div class="pass-top">
+          <div class="muted" id="pFlight">Flight FF 000</div>
+          <div class="pass-route">
+            <span class="big" id="pFrom">YYZ</span>
+            <span class="mid"><i></i><svg viewBox="-16 -14 32 28" aria-hidden="true"><path fill="currentColor" d="M14 0 L4 -2 L-2 -12 L-6 -12 L-3 -2 L-10 -1.6 L-13 -6 L-15.5 -6 L-13.5 0 L-15.5 6 L-13 6 L-10 1.6 L-3 2 L-6 12 L-2 12 L4 2 Z"/></svg><i></i></span>
+            <span class="big" id="pTo">YOW</span>
+          </div>
+          <div class="pass-cities"><span id="pFromCity"></span><span id="pToCity"></span></div>
+        </div>
+        <div class="perf"></div>
+        <div class="pass-grid">
+          <div><span>Focus time</span><b id="pTime">1h</b></div>
+          <div><span>Distance</span><b id="pDist">0</b></div>
+          <div><span>Gate</span><b id="pGate">B12</b></div>
+          <div><span>Seat</span><b id="pSeat">14A</b></div>
+        </div>
+        <button class="cta" id="takeoff">Board and take off</button>
+      </div>
+      <p class="note">The plane lands exactly when your focus time is up. Keep this tab open to hear the landing chime.</p>
+    </div>
+  </section>
+
+  <!-- FLIGHT -->
+  <section id="flight" hidden>
+    <div class="flight-head">
+      <div class="route" id="fRoute">YYZ → YOW <small>Toronto to Ottawa</small></div>
+      <div class="phase" id="fPhase">Climbing</div>
+    </div>
+    <div class="map" id="map"></div>
+    <div class="stats">
+      <div class="remain"><span>Time to landing</span><b id="fRemain">00:00</b></div>
+      <div><span>Elapsed</span><b id="fElapsed">0:00</b></div>
+      <div><span>Altitude</span><b id="fAlt">0 ft</b></div>
+      <div><span>Distance left</span><b id="fLeft">0 km</b></div>
+    </div>
+    <div class="profile"><svg viewBox="0 0 1000 70" preserveAspectRatio="none" id="profile" aria-hidden="true"></svg></div>
+    <div class="controls" id="flightControls">
+      <button class="btn" id="pauseBtn">Pause</button>
+      <button class="btn danger" id="endBtn">End flight early</button>
+    </div>
+    <div class="confirm" id="endConfirm" hidden>
+      <span>End this flight now? It will be logged as diverted.</span>
+      <div class="controls">
+        <button class="btn" id="keepFlying">Keep flying</button>
+        <button class="btn primary" id="endYes">End flight</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANDED -->
+  <section id="landed" class="landed" hidden>
+    <h1 id="lTitle">Welcome to Ottawa</h1>
+    <p id="lText"></p>
+    <div class="stats">
+      <div><span>Focused</span><b id="lTime"></b></div>
+      <div><span>Flown</span><b id="lDist"></b></div>
+      <div><span>Flights logged</span><b id="lCount"></b></div>
+    </div>
+    <div class="controls" style="margin-top:20px">
+      <button class="btn primary" id="again">Book another flight</button>
+    </div>
+  </section>
+</div>
+
+<dialog id="logDlg" aria-labelledby="logTitle">
+  <h2 id="logTitle">Logbook</h2>
+  <div class="log-totals">
+    <div><span>Flights</span><b id="tFlights">0</b></div>
+    <div><span>Focus time</span><b id="tTime">0m</b></div>
+    <div><span>Distance</span><b id="tDist">0 km</b></div>
+  </div>
+  <ul class="log-list" id="logList"></ul>
+  <div class="log-actions">
+    <button class="ghost" id="clearLog">Clear logbook</button>
+    <button class="btn" id="closeLog">Close</button>
+  </div>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
